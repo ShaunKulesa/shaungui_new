@@ -1,0 +1,8 @@
+setup.py
+C:/Users/Shaun/source/repos/spam/src/shaun_gui_functions/src/shaun_gui_functions.cpp
+shaun_gui_functions/__init__.py
+shaun_gui_functions/shaun_gui_functions.pyi
+shaun_gui_functions.egg-info/PKG-INFO
+shaun_gui_functions.egg-info/SOURCES.txt
+shaun_gui_functions.egg-info/dependency_links.txt
+shaun_gui_functions.egg-info/top_level.txt

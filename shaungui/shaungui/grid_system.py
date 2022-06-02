@@ -9,20 +9,6 @@ class GridSystem():
         self.rows = {}
         self.widgets = []
         self.queue = []
-    
-    # def add_widget(self, widget, column, row):
-    #     if column not in self.columns:
-    #         self.columns[column] = [0, 0]
-    #     if row not in self.rows:
-    #         self.rows[row] = [0, self.parent.height]
-
-        # if column > self.max_column:
-        #     self.max_column = column
-        # if row > self.max_row:
-        #     self.max_row = row
-        
-        # self.widgets.append(widget)
-        # self.queue.append(widget)
 
     def add_widget(self, widget, column, row):
         if column not in self.columns:

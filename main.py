@@ -30,10 +30,12 @@ window = shaungui.Window("Shaun's Window", 1920, 1080)
 
 # print(perf_counter() - start)
 
-table = shaungui.Table(window, height = 300, width = 1600)
-table.insert_row(400, 100)
-table.place(0, 0)
+# table = shaungui.Table(window, height = 300, width = 1600)
+# table.insert_row(400, 100)
+# table.place(0, 0)
 
+quad = shaungui.Quad(window, 100, 100, [255, 0, 0, 255])
+print(quad.__dir__())
 
 
 shaungui.start()

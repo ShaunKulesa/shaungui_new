@@ -1,10 +1,11 @@
 from OpenGL import GL
-import OpenGL.GL.shaders
-import glfw
-import pyrr
 import ctypes
 import array
 from shaun_gui_functions import _quad_rotate_around
+
+from shaungui.shader import Shader
+from ..buffer.buffer import Buffer
+from ..framebuffer.framebuffer import FrameBuffer
 
 class QuadDrawer():
     def __init__(self, parent, ortho):
@@ -19,11 +20,11 @@ class QuadDrawer():
 
             out vec4 frag_color;
 
-            uniform mat4 proj;
+            uniform mat4 projection;
             
             void main() {
               frag_color = color;
-              gl_Position = proj * vec4(position, 1.0);
+              gl_Position = projection * vec4(position, 1.0);
             }
         """
 
@@ -40,15 +41,14 @@ class QuadDrawer():
               fragColor = frag_color;
             }
         """
-        self.shader =  OpenGL.GL.shaders.compileProgram(
-            OpenGL.GL.shaders.compileShader(vertex_shader, GL.GL_VERTEX_SHADER), OpenGL.GL.shaders.compileShader(fragment_shader, GL.GL_FRAGMENT_SHADER))
         
+        #Shader stuff
+        self.shader = Shader(vertex_shader, fragment_shader)
+        self.shader.compile()
+        self.uniform_locations = {"proj": self.shader.get_uniform("projection")}
         self.ortho_values = ortho
-        
-        GL.glUseProgram(self.shader)
-
-        location = GL.glGetUniformLocation(self.shader, "proj")
-        GL.glUniformMatrix4fv(location, 1, GL.GL_FALSE, self.ortho_values)
+        self.shader.use()
+        self.shader.set_UniformMatrix4fv(self.uniform_locations["proj"], 1, GL.GL_FALSE, self.ortho_values)
 
         self.buffers_need_updating = False
 
@@ -63,8 +63,8 @@ class QuadDrawer():
         self.va = GL.glGenVertexArrays(1)
         GL.glBindVertexArray(self.va)
 
-        self.vertexPositions = GL.glGenBuffers(1)
-        GL.glBindBuffer(GL.GL_ARRAY_BUFFER, self.vertexPositions)
+        self.vertexPositions = Buffer()
+        self.vertexPositions.bind(GL.GL_ARRAY_BUFFER)
 
         GL.glVertexAttribPointer(0, 3, GL.GL_FLOAT, GL.GL_FALSE, 7 * 4, ctypes.c_void_p(0))
         GL.glEnableVertexAttribArray(0)
@@ -72,8 +72,8 @@ class QuadDrawer():
         GL.glVertexAttribPointer(1, 4, GL.GL_FLOAT, GL.GL_FALSE, 7 * 4, ctypes.c_void_p(3 * 4))
         GL.glEnableVertexAttribArray(1)
 
-        self.indexPositions = GL.glGenBuffers(1)
-        GL.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, self.indexPositions)
+        self.indexPositions = Buffer()
+        self.indexPositions.bind(GL.GL_ELEMENT_ARRAY_BUFFER)
 
     def add(self, queue):
         for quad in queue:
@@ -112,19 +112,34 @@ class QuadDrawer():
             self.indice_count += 4
 
     def update(self):
-        GL.glBindBuffer(GL.GL_ARRAY_BUFFER, self.vertexPositions)
-        GL.glBufferData(GL.GL_ARRAY_BUFFER, bytes(self.vertices), GL.GL_DYNAMIC_DRAW)
+        GL.glBindVertexArray(self.va)
+        
+        self.vertexPositions.bind(GL.GL_ARRAY_BUFFER)
+        self.vertexPositions.bind_data(GL.GL_ARRAY_BUFFER, bytes(self.vertices))
 
-        GL.glBindBuffer(GL.GL_ARRAY_BUFFER, self.indexPositions)
-        GL.glBufferData(GL.GL_ARRAY_BUFFER, bytes(self.indices), GL.GL_DYNAMIC_DRAW)
+        self.indexPositions.bind(GL.GL_ARRAY_BUFFER)
+        self.indexPositions.bind_data(GL.GL_ARRAY_BUFFER, bytes(self.indices))
 
     def render(self):
         if self.buffers_need_updating:
             self.update()
             self.buffers_need_updating = False
 
-        GL.glUseProgram(self.shader)
+        #framebuffer
+        
+        self.shader.use()
 
         GL.glBindVertexArray(self.va)
 
         GL.glDrawElements(GL.GL_TRIANGLES, len(self.indices), GL.GL_UNSIGNED_INT, None)
+    
+    def read_pixels(self, x, y, width, height):
+        GL.glViewport(x, y, width, height)
+        GL.glClear(GL.GL_COLOR_BUFFER_BIT)
+        framebuffer = FrameBuffer(width, height)
+        framebuffer.use()
+        self.update()
+        self.render()
+        pixels = framebuffer.read_pixels(x, y, width, height)
+        framebuffer.delete()
+        return pixels

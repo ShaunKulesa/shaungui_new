@@ -1,4 +1,5 @@
 from .start import start
 from .window import Window
 from .quad.quad import Quad
-from.table import Table
+from .table.table import Table
+from .percentage_chart import PercentageChart

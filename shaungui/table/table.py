@@ -1,10 +1,9 @@
-from .quad.quad_drawer import QuadDrawer
-from .grid_system import GridSystem
-from .place_system import PlaceSystem
-from .quad.quad import Quad
+from ..quad.quad_drawer import QuadDrawer
+from ..grid_system.grid_system import GridSystem
+from ..place_system.place_system import PlaceSystem
+from ..quad.quad import Quad
 
 import pyrr
-import glfw
 from OpenGL import GL
 
 class Table():

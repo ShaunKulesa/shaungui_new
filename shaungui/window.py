@@ -3,8 +3,8 @@ from OpenGL import GL
 import pyrr
 
 from .start import add_window
-from .place_system import PlaceSystem
-from .grid_system import GridSystem
+from .place_system.place_system import PlaceSystem
+from .grid_system.grid_system import GridSystem
 from .quad.quad_drawer import QuadDrawer
 
 class Window():
@@ -21,6 +21,7 @@ class Window():
         glfw.swap_interval(1)
 
         add_window(self)
+
         glfw.set_window_size(self.glfw_window, self.width, self.height)
         width, height = glfw.get_window_size(self.glfw_window)
 
@@ -37,9 +38,8 @@ class Window():
     
     def render(self):
         glfw.make_context_current(self.glfw_window)
+        GL.glViewport(0, 0, self.width, self.height)
 
-        # GL.glViewport(100, 0, self.width, self.height)
-        
         GL.glClear(GL.GL_COLOR_BUFFER_BIT)
         GL.glClearColor(self.background_colour[0]/255, self.background_colour[1]/255, self.background_colour[2]/255, self.background_colour[3]/255)
 
@@ -52,7 +52,7 @@ class Window():
             self.quad_drawer.buffers_need_updating = True
         
         self.quad_drawer.render()
-
+        
         for widget in self.widgets:
             widget.render()
 

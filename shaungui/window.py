@@ -1,6 +1,7 @@
 import glfw
 from OpenGL import GL
 import pyrr
+import time
 
 from .start import add_window
 from .place_system.place_system import PlaceSystem
@@ -35,6 +36,11 @@ class Window():
         self.quad_drawer = QuadDrawer(self, ortho)
 
         self.widgets = []
+
+        timer = time.time()
+        print(timer)
+
+        self.after_functions = []
     
     def render(self):
         glfw.make_context_current(self.glfw_window)
@@ -57,5 +63,8 @@ class Window():
             widget.render()
 
         glfw.swap_buffers(self.glfw_window)
+        
+    def after(self, function, time_period):
+        self.after_functions.append([function, time.time(), time_period])
         
 

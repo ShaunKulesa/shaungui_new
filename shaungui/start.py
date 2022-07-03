@@ -16,6 +16,9 @@ def start():
         
         for window in windows:
             window.render()
+            if glfw.window_should_close(window.glfw_window):
+                windows.remove(window)
+                break
 
         glfw.poll_events()
     glfw.terminate()

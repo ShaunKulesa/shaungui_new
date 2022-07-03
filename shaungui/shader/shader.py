@@ -26,3 +26,6 @@ class Shader():
     
     def set_UniformMatrix4fv(self, location, count, transpose, value):
         GL.glUniformMatrix4fv(location, count, transpose, value)
+    
+    def set_Uniform4fv(self, location, count, value):
+        GL.glUniform4fv(location, count, value)

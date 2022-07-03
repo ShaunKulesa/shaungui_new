@@ -4,8 +4,8 @@ import array
 from shaun_gui_functions import _quad_rotate_around
 
 from shaungui.shader import Shader
-from ..buffer.buffer import Buffer
-from ..framebuffer.framebuffer import FrameBuffer
+from shaungui.buffer import Buffer
+from shaungui.framebuffer import FrameBuffer
 
 class QuadDrawer():
     def __init__(self, parent, ortho):
@@ -46,6 +46,7 @@ class QuadDrawer():
         self.shader = Shader(vertex_shader, fragment_shader)
         self.shader.compile()
         self.uniform_locations = {"proj": self.shader.get_uniform("projection")}
+        print(self.uniform_locations["proj"])
         self.ortho_values = ortho
         self.shader.use()
         self.shader.set_UniformMatrix4fv(self.uniform_locations["proj"], 1, GL.GL_FALSE, self.ortho_values)
@@ -124,8 +125,6 @@ class QuadDrawer():
         if self.buffers_need_updating:
             self.update()
             self.buffers_need_updating = False
-
-        #framebuffer
         
         self.shader.use()
 

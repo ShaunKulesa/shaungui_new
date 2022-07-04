@@ -4,6 +4,8 @@ from OpenGL import GL
 from array import array
 import ctypes
 
+# turn into batch drawing for multiple charts
+
 class ChartDrawer:
     def __init__(self) -> None:
         self.vertex_shader = """
@@ -73,7 +75,6 @@ class ChartDrawer:
         self.shader.set_UniformMatrix4fv(self.shader.get_uniform("projection"), 1, GL.GL_FALSE, ortho)
         
         self.points = []
-        self.points_array = array('f', self.points).tobytes()
 
         self.buffer_update = False
         self.vao = GL.glGenVertexArrays(1)
@@ -91,12 +92,11 @@ class ChartDrawer:
 
     def add_quad(self, width, height, x, y, colour):
         self.points.extend([x, y, width, height, colour[0]/255, colour[1]/255,colour[2]/255, colour[3]/255])
-        self.points_array = array('f', self.points).tobytes()
         self.buffer_update = True
 
     def update(self):
         GL.glBindBuffer(GL.GL_ARRAY_BUFFER, self.vbo)
-        GL.glBufferData(GL.GL_ARRAY_BUFFER, self.points_array, GL.GL_STATIC_DRAW)
+        GL.glBufferData(GL.GL_ARRAY_BUFFER, array('f', self.points).tobytes(), GL.GL_STATIC_DRAW)
 
     def render(self):
         if self.buffer_update:

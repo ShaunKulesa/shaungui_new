@@ -113,7 +113,7 @@ class QuadDrawer():
             self.indice_count += 4
 
     def update(self):
-        GL.glBindVertexArray(self.va)
+        # GL.glBindVertexArray(self.va)
         
         self.vertexPositions.bind(GL.GL_ARRAY_BUFFER)
         self.vertexPositions.bind_data(GL.GL_ARRAY_BUFFER, bytes(self.vertices))

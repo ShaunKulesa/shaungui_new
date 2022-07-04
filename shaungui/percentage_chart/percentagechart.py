@@ -9,51 +9,53 @@ from OpenGL import GL
 from array import array
 import ctypes
 
-class ChartQuad:
-    def __init__(self, x, y, width, height) -> None:
+class ChartDrawer:
+    def __init__(self) -> None:
         self.vertex_shader = """
             #version 330
 
             in vec2 in_position;
             in vec2 in_size;
+            in vec4 in_colour;
             
             out vec2 position;
             out vec2 size;
+            out vec4 vs_colour;
 
             void main() {
                 position = in_position;
                 size = in_size;
+                vs_colour = in_colour;
             }
         """
 
         self.fragment_shader = """
             #version 330 core
 
-            in vec4 colour;
+            in vec4 gs_colour;
             out vec4 outColour;
 
             void main()
             {
-                outColour = colour;
+                outColour = gs_colour;
             }
         """
 
         self.geometry_shader = """
             #version 330
             layout (points) in;
-            layout (triangle_strip, max_vertices = 4) out;
+            layout (triangle_strip, max_vertices = 8) out;
 
             in vec2 position[];
             in vec2 size[];
 
             uniform mat4 projection;
 
-            uniform vec4 in_colour;
-
-            out vec4 colour;
-            
-            void main() {      
-                colour = in_colour; 
+            in vec4 vs_colour[];
+            out vec4 gs_colour;
+        
+            void main() {
+                gs_colour = vs_colour[0];
                 gl_Position = projection * vec4(position[0].x, position[0].y, 0.0, 1.0); // bottom left
                 EmitVertex();
                 gl_Position = projection * vec4(position[0].x, position[0].y + size[0].y, 0.0, 1.0); // top left
@@ -63,48 +65,57 @@ class ChartQuad:
                 gl_Position = projection * vec4(position[0].x + size[0].x, position[0].y + size[0].y, 0.0, 1.0); // top right
                 EmitVertex();
                 EndPrimitive();
-
-                for(int row = 0; row <= 10; row++) {
-                    for(int col = 0; col <= 10; col++) {
-
-                    }                    
-                }
             }
         """
 
         self.shader = Shader(self.vertex_shader, self.fragment_shader, geometry_shader=self.geometry_shader)
         self.shader.compile()
-        print(self.shader.get_uniform("projection"))
         self.shader.use()
-        print(self.shader.get_uniform("projection"))
-
-        
 
         ortho = pyrr.matrix44.create_orthogonal_projection_matrix(
             0, 500, 0, 500, 0, 1, dtype="float32")
 
         self.shader.set_UniformMatrix4fv(self.shader.get_uniform("projection"), 1, GL.GL_FALSE, ortho)
-        self.shader.set_Uniform4fv(self.shader.get_uniform("in_colour"), 1, (255.0, 0.0, 0.0, 255.0))
         
-        self.points = array('f', [x, y, width, height]).tobytes()
+        self.points = []
+        self.points_array = array('f', self.points).tobytes()
 
+        self.buffer_update = False
         self.vao = GL.glGenVertexArrays(1)
         GL.glBindVertexArray(self.vao)
         
         self.vbo = GL.glGenBuffers(1)        
         GL.glBindBuffer(GL.GL_ARRAY_BUFFER, self.vbo)
-        GL.glBufferData(GL.GL_ARRAY_BUFFER, self.points, GL.GL_STATIC_DRAW)
+        GL.glBufferData(GL.GL_ARRAY_BUFFER, self.points_array, GL.GL_STATIC_DRAW)
 
+        print(GL.glGetAttribLocation(self.shader.shader, "in_position"))
         GL.glEnableVertexAttribArray(GL.glGetAttribLocation(self.shader.shader, "in_position"))
-        GL.glVertexAttribPointer(GL.glGetAttribLocation(self.shader.shader, "in_position"), 2, GL.GL_FLOAT, GL.GL_FALSE, 4 * 4, ctypes.c_void_p(0))
-
+        GL.glVertexAttribPointer(GL.glGetAttribLocation(self.shader.shader, "in_position"), 2, GL.GL_FLOAT, GL.GL_FALSE, 8 * 4, ctypes.c_void_p(0))
+        print(GL.glGetAttribLocation(self.shader.shader, "in_size"))
         GL.glEnableVertexAttribArray(GL.glGetAttribLocation(self.shader.shader, "in_size"))
-        GL.glVertexAttribPointer(GL.glGetAttribLocation(self.shader.shader, "in_size"), 2, GL.GL_FLOAT, GL.GL_FALSE, 4 * 4, ctypes.c_void_p(2 * 4))
+        GL.glVertexAttribPointer(GL.glGetAttribLocation(self.shader.shader, "in_size"), 2, GL.GL_FLOAT, GL.GL_FALSE, 8 * 4, ctypes.c_void_p(2 * 4))
+        print(GL.glGetAttribLocation(self.shader.shader, "in_colour"))
+        GL.glEnableVertexAttribArray(GL.glGetAttribLocation(self.shader.shader, "in_colour"))
+        GL.glVertexAttribPointer(GL.glGetAttribLocation(self.shader.shader, "in_colour"), 4, GL.GL_FLOAT, GL.GL_FALSE, 8 * 4, ctypes.c_void_p(4 * 4))
+
+    def add_quad(self, width, height, x, y, colour):
+        self.points.extend([x, y, width, height, colour[0]/255, colour[1]/255,colour[2]/255, colour[3]/255])
+        self.points_array = array('f', self.points).tobytes()
+        self.buffer_update = True
+
+    def update(self):
+        GL.glBindVertexArray(self.vao)
+        GL.glBindBuffer(GL.GL_ARRAY_BUFFER, self.vbo)
+        GL.glBufferData(GL.GL_ARRAY_BUFFER, self.points_array, GL.GL_STATIC_DRAW)
 
     def render(self):
+        if self.buffer_update:
+            self.update()
+            self.buffer_update = False
+
         self.shader.use()
         GL.glBindVertexArray(self.vao)
-        GL.glDrawArrays(GL.GL_POINTS, 0, 2)
+        GL.glDrawArrays(GL.GL_POINTS, 0, len(self.points) // 8)
         
 class PercentageChart():
     def __init__(self, parent, percentage, width=100, height=100, filled_colour=[255, 0, 0, 255], unfilled_colour=[0, 0, 0, 255], line_colour=[255, 255, 255, 255], outline_colour=[0, 0, 0, 255], line_spacing=1, outline_width=1) -> None:
@@ -149,50 +160,42 @@ class PercentageChart():
         self.x = x
         self.y = y
 
-        self.chart_quad = ChartQuad(self.x, self.y, self.width, self.height)
+        self.chart_quad = ChartDrawer()
 
+        quad_width = ((self.width - (self.line_spacing * (10 - 1))) - (self.outline_width * 2)) / 10
+        quad_height = ((self.height - (self.line_spacing * (10 - 1))) - (self.outline_width * 2)) / 10
         
-        # ortho = pyrr.matrix44.create_orthogonal_projection_matrix(0, self.width, 0, self.height, 0, 1, dtype="float32")
-        # self.quad_drawer = QuadDrawer(self, ortho)
+        for row in range(10):
+            for column in range(10):
+                if (row * 10) + column + 1 <= self.percentage:
+                    colour = self.filled_colour
+                else:
+                    colour = self.unfilled_colour
 
-        # self.background.place(0, 0)
+                column_spacing = (quad_width + self.line_spacing) * column
+                column_spacing += self.outline_width
 
-        # quad_width = ((self.width - (self.line_spacing * (10 - 1))) - (self.outline_width * 2)) / 10
-        # quad_height = ((self.height - (self.line_spacing * (10 - 1))) - (self.outline_width * 2)) / 10
+                row_spacing = (self.height - ((quad_height + self.line_spacing) * row)) - quad_height
+                row_spacing -= self.outline_width
+
+                self.chart_quad.add_quad(quad_width, quad_height, column_spacing, row_spacing, colour)
         
+        # left outline
+        self.chart_quad.add_quad(self.outline_width, self.height, 0, 0, self.outline_colour)
 
-        # for row in range(10):
-        #     for column in range(10):
-        #         if (row * 10) + column + 1 <= self.percentage:
-        #             colour = self.filled_colour
-        #         else:
-        #             colour = self.unfilled_colour
+        # right outline
+        self.chart_quad.add_quad(self.outline_width, self.height, self.width - self.outline_width, 0, self.outline_colour)
 
-        #         column_spacing = (quad_width + self.line_spacing) * column
-        #         column_spacing += self.outline_width
+        # top outline
+        self.chart_quad.add_quad(self.width, self.outline_width, 0, 0, self.outline_colour)
 
-        #         row_spacing = (self.height - ((quad_height + self.line_spacing) * row)) - quad_height
-        #         row_spacing -= self.outline_width
+        # bottom outline
+        self.chart_quad.add_quad(self.width, self.outline_width, 0, self.height - self.outline_width, self.outline_colour)
 
-        #         quad = Quad(self, quad_width, quad_height, colour)
-        #         quad.place(column_spacing, row_spacing)
+    def png_save(self):
+        if len(self.place_system.queue) > 0:
+            self.place_system.display_queue()
+            self.quad_drawer.buffers_need_updating = True
         
-        # left_outline = Quad(self, self.outline_width, self.height, self.outline_colour)
-        # left_outline.place(0, 0)
-
-        # right_outline = Quad(self, self.outline_width, self.height, self.outline_colour)
-        # right_outline.place(self.width - self.outline_width, 0)
-
-        # top_outline = Quad(self, self.width  - (self.outline_width * 2), self.outline_width, self.outline_colour)
-        # top_outline.place(0 + self.outline_width, 0)
-
-        # bottom_outline = Quad(self, self.width  - (self.outline_width * 2), self.outline_width, self.outline_colour)
-        # bottom_outline.place(0 + self.outline_width, self.height - self.outline_width)
-                
-    # def png_save(self):
-    #     if len(self.place_system.queue) > 0:
-    #         self.place_system.display_queue()
-    #         self.quad_drawer.buffers_need_updating = True
-        
-    #     pixels = self.quad_drawer.read_pixels(0, 0, self.width, self.height)
-    #     image = Image.frombytes("RGBA", (self.width, self.height), pixels).transpose(Image.FLIP_TOP_BOTTOM).save("percentage_chart.png")
+        pixels = self.quad_drawer.read_pixels(0, 0, self.width, self.height)
+        image = Image.frombytes("RGBA", (self.width, self.height), pixels).transpose(Image.FLIP_TOP_BOTTOM).save("percentage_chart.png")

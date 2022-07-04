@@ -29,3 +29,6 @@ class Shader():
     
     def set_Uniform4fv(self, location, count, value):
         GL.glUniform4fv(location, count, value)
+
+    def set_Uniform1i(self, location, value):
+        GL.glUniform1i(location, value)

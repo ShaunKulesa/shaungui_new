@@ -1,7 +1,7 @@
 import glfw
 from OpenGL import GL
 import pyrr
-import time
+from time import perf_counter
 
 from .start import add_window
 from .place_system.place_system import PlaceSystem
@@ -37,12 +37,21 @@ class Window():
 
         self.widgets = []
 
-        timer = time.time()
-        print(timer)
+        # timer = time.time()
+        # print(timer)
+
+        self.delta_time = 0
+        self.last_delta = 0
 
         self.after_functions = []
     
     def render(self):
+        self.delta_time = perf_counter() - self.last_delta
+        print(1 / self.delta_time)
+
+        self.last_delta = perf_counter()
+
+
         glfw.make_context_current(self.glfw_window)
         GL.glViewport(0, 0, self.width, self.height)
 
@@ -64,7 +73,7 @@ class Window():
 
         glfw.swap_buffers(self.glfw_window)
         
-    def after(self, function, time_period):
-        self.after_functions.append([function, time.time(), time_period])
+    # def after(self, function, time_period):
+    #     self.after_functions.append([function, time.time(), time_period])
         
 

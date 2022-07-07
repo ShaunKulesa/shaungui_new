@@ -18,8 +18,7 @@ def start():
             window.render()
             if glfw.window_should_close(window.glfw_window):
                 windows.remove(window)
-                break
-
+                glfw.destroy_window(window.glfw_window)
         glfw.poll_events()
     glfw.terminate()
 

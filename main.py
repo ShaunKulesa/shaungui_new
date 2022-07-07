@@ -1,17 +1,15 @@
 import shaungui
 
 window = shaungui.Window("Shaun's Window", 1500, 750)
+# window2 = shaungui.Window("Shaun's Window 2", 1500, 750)
 
-# for x in range(1000):
-#     chart = shaungui.PercentageChart(window, 15, 500, 500, unfilled_colour=[255, 255, 255, 255], background_colour=[0, 255, 0, 255], line_spacing=2, outline_width=2, outline_colour=[255, 0, 255, 255])
-#     chart.place(x * 100, 100)
 
-# get all quads to render on the screen
-for x in range(1000000):
-    quad = shaungui.Quad(window, 100, 100, [255, 0, 0, 255])
-    quad.place(x * 100, 100)
+canvas = shaungui.Canvas(window, 500, 500)
+canvas.place(0, 0)
+
+canvas.create_rectangle(0, 0, 100, 100, [255, 0, 0, 255], id="rectangle")
+canvas.create_rectangle(0, 0, 100, 100, [255, 255, 0, 255], id="rectangle1")
+canvas.move_to("rectangle", 400, 400)
+canvas.move_to("rectangle1", 300, 300)
 
 shaungui.start()
-
-#78.5
-#127.5

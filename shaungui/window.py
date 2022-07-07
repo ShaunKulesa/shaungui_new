@@ -19,7 +19,6 @@ class Window():
 
         self.glfw_window = glfw.create_window(self.width, self.height, self.title, None, None)
         glfw.make_context_current(self.glfw_window)
-        glfw.swap_interval(1)
 
         add_window(self)
 
@@ -47,12 +46,15 @@ class Window():
     
     def render(self):
         self.delta_time = perf_counter() - self.last_delta
-        print(1 / self.delta_time)
+        # print(1 / self.delta_time)
 
         self.last_delta = perf_counter()
 
 
         glfw.make_context_current(self.glfw_window)
+
+        glfw.swap_interval(1)
+
         GL.glViewport(0, 0, self.width, self.height)
 
         GL.glClear(GL.GL_COLOR_BUFFER_BIT)

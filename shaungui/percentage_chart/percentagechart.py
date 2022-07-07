@@ -36,7 +36,7 @@ class PercentageChart():
         self.x = x
         self.y = y
 
-        self.chart_quad = ChartDrawer()
+        self.chart_quad = ChartDrawer(self.width, self.height)
 
         # background
         self.chart_quad.add_quad(self.width, self.height, 0, 0, self.background_colour)

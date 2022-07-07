@@ -1,18 +1,15 @@
 from OpenGL import GL
 import ctypes
 from array import array
-from shaun_gui_functions import _quad_rotate_around
 
 from shaungui.shader import Shader
-from shaungui.buffer import Buffer
-from shaungui.framebuffer import FrameBuffer
 
 class QuadDrawer():
     def __init__(self, parent, ortho):
         GL.glEnable(GL.GL_BLEND)
         GL.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA)
 
-        self.vertex_shader = """
+        vertex_shader = """
             #version 330
 
             in vec2 in_position;
@@ -30,7 +27,7 @@ class QuadDrawer():
             }
         """
 
-        self.fragment_shader = """
+        fragment_shader = """
             #version 330 core
 
             in vec4 gs_colour;
@@ -43,7 +40,7 @@ class QuadDrawer():
         """
 
         #add rotation
-        self.geometry_shader = """
+        geometry_shader = """
             #version 330
             layout (points) in;
             layout (triangle_strip, max_vertices = 4) out;
@@ -70,7 +67,7 @@ class QuadDrawer():
             }
         """
 
-        self.shader = Shader(self.vertex_shader, self.fragment_shader, geometry_shader=self.geometry_shader)
+        self.shader = Shader(vertex_shader, fragment_shader, geometry_shader=geometry_shader)
         self.shader.compile()
         self.shader.use()
 
@@ -112,7 +109,7 @@ class QuadDrawer():
 
     def update(self):
         GL.glBindBuffer(GL.GL_ARRAY_BUFFER, self.vbo)
-        GL.glBufferData(GL.GL_ARRAY_BUFFER, self.points.tobytes(), GL.GL_STATIC_DRAW)
+        GL.glBufferData(GL.GL_ARRAY_BUFFER, self.points.tobytes(), GL.GL_DYNAMIC_DRAW)
 
     def render(self):
         if self.buffers_need_updating:

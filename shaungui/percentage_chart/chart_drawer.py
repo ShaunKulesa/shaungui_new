@@ -7,7 +7,7 @@ import ctypes
 # turn into batch drawing for multiple charts
 
 class ChartDrawer:
-    def __init__(self) -> None:
+    def __init__(self, width, height) -> None:
         self.vertex_shader = """
             #version 330
 
@@ -70,7 +70,7 @@ class ChartDrawer:
         self.shader.use()
 
         ortho = pyrr.matrix44.create_orthogonal_projection_matrix(
-            0, 500, 0, 500, 0, 1, dtype="float32")
+            0, width, 0, height, 0, 1, dtype="float32")
 
         self.shader.set_UniformMatrix4fv(self.shader.get_uniform("projection"), 1, GL.GL_FALSE, ortho)
         

@@ -7,6 +7,7 @@ from .start import add_window
 from .place_system.place_system import PlaceSystem
 from .grid_system.grid_system import GridSystem
 from .quad.quad_drawer import QuadDrawer
+from .input import Input
 
 class Window():
     def __init__(self, title, width, height, background_colour=[0, 0, 0, 255]):
@@ -43,6 +44,9 @@ class Window():
         self.last_delta = 0
 
         self.after_functions = []
+
+        # Initialize the Input class
+        self.input = Input(self.glfw_window)
     
     def render(self):
         # self.delta_time = perf_counter() - self.last_delta

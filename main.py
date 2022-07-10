@@ -41,10 +41,10 @@ def update():
         canvas.move("rectangle", 100 * dt, 0)
 
     # Update at a rate of 60 FPS
-    window.after(update, 1 // 60)
+    window.after(update, 1 / 60)
 
 
 # Update at a rate of 60 FPS
-window.after(update, 1 // 60)
+window.after(update, 1 / 60)
 
 shaungui.start()

@@ -42,7 +42,7 @@ class Window():
 
         self.after_functions = []
 
-        # Initialize the Input class
+        # Instantiate the input system
         self.input = Input(self.glfw_window)
     
     def render(self):

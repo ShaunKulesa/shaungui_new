@@ -40,21 +40,12 @@ class Window():
         # timer = time.time()
         # print(timer)
 
-        self.delta_time = 0
-        self.last_delta = 0
-
         self.after_functions = []
 
         # Initialize the Input class
         self.input = Input(self.glfw_window)
     
     def render(self):
-        # self.delta_time = perf_counter() - self.last_delta
-        # print(1 / self.delta_time)
-
-        # self.last_delta = perf_counter()
-
-
         glfw.make_context_current(self.glfw_window)
 
         glfw.swap_interval(1)

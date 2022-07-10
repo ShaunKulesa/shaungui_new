@@ -18,11 +18,8 @@ last_delta = 0
 def update():
     global last_delta, dt
 
-    # Calculate delta time (time since last frame was rendered)
-    dt = time.perf_counter() - last_delta
-
-    # Keep track of start of current frame render
-    last_delta = time.perf_counter()
+    # Delta time
+    dt = window.delta_time
 
     # Close window when ESCAPE key was pressed at any moment
     for key, pressed in window.input.key_events():
@@ -42,7 +39,6 @@ def update():
 
     # Update at same rate as renderer
     window.after(update, 0)
-
 
 # Update at same rate as renderer
 window.after(update, 0)

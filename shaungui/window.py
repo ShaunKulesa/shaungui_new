@@ -44,8 +44,12 @@ class Window():
 
         # Instantiate the input system
         self.input = Input(self.glfw_window)
+
+        self.delta_time = 0
     
     def render(self):
+        start_time = time.time()
+
         glfw.make_context_current(self.glfw_window)
 
         glfw.swap_interval(1)
@@ -74,6 +78,8 @@ class Window():
             if time.time() >= after_function[1] + after_function[2]:
                 after_function[0]()
                 self.after_functions.remove(after_function)
+        
+        self.delta_time = time.time() - start_time
                 
     def after(self, function, seconds):
         self.after_functions.append([function, time.time(), seconds])

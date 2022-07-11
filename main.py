@@ -1,3 +1,5 @@
+import time
+
 import shaungui
 import glfw
 
@@ -8,8 +10,11 @@ canvas.place(0, 0)
 
 canvas.create_rectangle(1, 1, 100, 100, [255, 0, 0, 255], id="rectangle")
 
+dt = 0
+last_delta = 0
+
+
 def update():
-    # Delta time
     dt = window.delta_time
 
     # Close window when ESCAPE key was pressed at any moment

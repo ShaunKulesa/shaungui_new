@@ -43,7 +43,6 @@ def update():
     # Update at same rate as renderer
     window.after(update, 0)
 
-
 # Update at same rate as renderer
 window.after(update, 0)
 

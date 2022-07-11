@@ -10,7 +10,7 @@ class QuadDrawer():
         GL.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA)
 
         vertex_shader = """
-            #version 330
+            #version 410
 
             in vec2 in_position;
             in vec2 in_size;
@@ -28,7 +28,7 @@ class QuadDrawer():
         """
 
         fragment_shader = """
-            #version 330 core
+            #version 410 core
 
             in vec4 gs_colour;
             out vec4 outColour;
@@ -41,7 +41,7 @@ class QuadDrawer():
 
         #add rotation
         geometry_shader = """
-            #version 330
+            #version 410
             layout (points) in;
             layout (triangle_strip, max_vertices = 4) out;
 
@@ -68,6 +68,10 @@ class QuadDrawer():
         """
 
         self.shader = Shader(vertex_shader, fragment_shader, geometry_shader=geometry_shader)
+
+        self.va = GL.glGenVertexArrays(1)
+        GL.glBindVertexArray(self.va)
+
         self.shader.compile()
         self.shader.use()
 
@@ -81,9 +85,6 @@ class QuadDrawer():
         self.quads = []
 
         self.points = array('f', [])
-
-        self.va = GL.glGenVertexArrays(1)
-        GL.glBindVertexArray(self.va)
 
         self.vbo = GL.glGenBuffers(1)
         self.update()

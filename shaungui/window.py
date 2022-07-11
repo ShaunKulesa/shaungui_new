@@ -18,6 +18,14 @@ class Window():
 
         self.window = self
 
+        # Force OpenGL context version
+        glfw.window_hint(glfw.GLFW.GLFW_CLIENT_API, glfw.GLFW.GLFW_OPENGL_API)
+        glfw.window_hint(glfw.GLFW.GLFW_CONTEXT_VERSION_MAJOR, 4)
+        glfw.window_hint(glfw.GLFW.GLFW_CONTEXT_VERSION_MINOR, 1)
+        glfw.window_hint(glfw.GLFW.GLFW_OPENGL_PROFILE,
+                         glfw.GLFW.GLFW_OPENGL_CORE_PROFILE)
+        glfw.window_hint(glfw.GLFW.GLFW_OPENGL_FORWARD_COMPAT, glfw.GLFW.GLFW_TRUE)
+
         self.glfw_window = glfw.create_window(self.width, self.height, self.title, None, None)
         glfw.make_context_current(self.glfw_window)
 

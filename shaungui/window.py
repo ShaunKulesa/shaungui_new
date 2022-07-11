@@ -42,6 +42,8 @@ class Window():
 
         self.after_functions = []
 
+        self.key_binds = []
+
         # Instantiate the input system
         self.input = Input(self.glfw_window)
 
@@ -79,7 +81,17 @@ class Window():
                 after_function[0]()
                 self.after_functions.remove(after_function)
         
+        for key_bind in self.key_binds:
+            if self.input.key_pressed(key_bind[0]) == True:
+                key_bind[1]()
+        
         self.delta_time = time.time() - start_time
                 
     def after(self, function, seconds):
         self.after_functions.append([function, time.time(), seconds])
+
+    def key_bind(self, key, function):
+        self.key_binds.append([key, function])
+    
+    def close(self):
+        glfw.set_window_should_close(self.glfw_window, 1)

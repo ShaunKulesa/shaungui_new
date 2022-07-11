@@ -1,3 +1,5 @@
+import time
+
 import shaungui
 import glfw
 
@@ -8,9 +10,18 @@ canvas.place(0, 0)
 
 canvas.create_rectangle(1, 1, 100, 100, [255, 0, 0, 255], id="rectangle")
 
+dt = 0
+last_delta = 0
+
+
 def update():
-    # Delta time
-    dt = window.delta_time
+    global last_delta, dt
+
+    # Calculate delta time (time since last frame was rendered)
+    dt = time.perf_counter() - last_delta
+
+    # Keep track of start of current frame render
+    last_delta = time.perf_counter()
 
     # Close window when ESCAPE key was pressed at any moment
     if window.input.key_pressed('ESCAPE'):

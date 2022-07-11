@@ -9,7 +9,7 @@ import ctypes
 class ChartDrawer:
     def __init__(self, width, height) -> None:
         self.vertex_shader = """
-            #version 330
+            #version 410
 
             in vec2 in_position;
             in vec2 in_size;
@@ -27,7 +27,7 @@ class ChartDrawer:
         """
 
         self.fragment_shader = """
-            #version 330 core
+            #version 410 core
 
             in vec4 gs_colour;
             out vec4 outColour;
@@ -39,7 +39,7 @@ class ChartDrawer:
         """
 
         self.geometry_shader = """
-            #version 330
+            #version 410
             layout (points) in;
             layout (triangle_strip, max_vertices = 8) out;
 

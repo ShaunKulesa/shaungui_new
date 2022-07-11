@@ -50,22 +50,16 @@ class Canvas:
         self.parent.widgets.append(self)
     
     def move_to(self, id, x, y):
-        for shape_id in self.ids:
-            if id == shape_id:
-                if self.ids[id][0] == "rectangle":
-                    self.rectangle_drawer.rectangle_points[(self.ids[id][1] * 8) - 8] = x
-                    self.rectangle_drawer.rectangle_points[(self.ids[id][1] * 8 + 1) - 8] = y
-                    self.rectangle_buffer_needs_updating = True
-                break
+        if self.ids[id][0] == "rectangle":
+            self.rectangle_drawer.rectangle_points[(self.ids[id][1] * 8) - 8] = x
+            self.rectangle_drawer.rectangle_points[(self.ids[id][1] * 8 + 1) - 8] = y
+            self.rectangle_buffer_needs_updating = True
     
     def move(self, id, x, y):
-        for shape_id in self.ids:
-            if id == shape_id:
-                if self.ids[id][0] == "rectangle":
-                    self.rectangle_drawer.rectangle_points[(self.ids[id][1] * 8) - 8] += x
-                    self.rectangle_drawer.rectangle_points[(self.ids[id][1] * 8 + 1) - 8] += y
-                    self.rectangle_drawer.rectangle_buffer_needs_updating = True
-                break
+        if self.ids[id][0] == "rectangle":
+            self.rectangle_drawer.rectangle_points[(self.ids[id][1] * 8) - 8] += x
+            self.rectangle_drawer.rectangle_points[(self.ids[id][1] * 8 + 1) - 8] += y
+            self.rectangle_drawer.rectangle_buffer_needs_updating = True
     
     def get_coords(self, id) -> list[float]:
         for shape_id in self.ids:

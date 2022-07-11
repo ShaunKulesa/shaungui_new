@@ -3,7 +3,6 @@ import time
 import shaungui
 import glfw
 
-
 window = shaungui.Window("Shaun's Window", 1500, 750)
 
 canvas = shaungui.Canvas(window, 500, 500)
@@ -25,19 +24,18 @@ def update():
     last_delta = time.perf_counter()
 
     # Close window when ESCAPE key was pressed at any moment
-    for key, pressed in window.input.key_events():
-        if key == glfw.KEY_ESCAPE and pressed:
-            glfw.set_window_should_close(window.glfw_window, True)
+    if window.input.key_pressed('ESCAPE'):
+        window.close()
 
     # Move canvas when key is pressed (WASD)
-    if window.input.key_pressed(glfw.KEY_W):
+    if window.input.key_pressed('W'):
         canvas.move("rectangle", 0, 100 * dt)
-    elif window.input.key_pressed(glfw.KEY_S):
+    elif window.input.key_pressed('S'):
         canvas.move("rectangle", 0, -100 * dt)
 
-    if window.input.key_pressed(glfw.KEY_A):
+    if window.input.key_pressed('A'):
         canvas.move("rectangle", -100 * dt, 0)
-    elif window.input.key_pressed(glfw.KEY_D):
+    elif window.input.key_pressed('D'):
         canvas.move("rectangle", 100 * dt, 0)
 
     # Update at same rate as renderer
@@ -45,5 +43,26 @@ def update():
 
 # Update at same rate as renderer
 window.after(update, 0)
+
+def escape():
+    window.close()
+
+def right():
+    canvas.move("rectangle", 100 * window.delta_time, 0)
+
+def left():
+    canvas.move("rectangle", -100 * window.delta_time, 0)
+
+def up():
+    canvas.move("rectangle", 0, 100 * window.delta_time)
+
+def down():
+    canvas.move("rectangle", 0, -100 * window.delta_time)
+
+window.key_bind("ESCAPE", escape)
+window.key_bind("D", right)
+window.key_bind("A", left)
+window.key_bind("W", up)
+window.key_bind("S", down)
 
 shaungui.start()

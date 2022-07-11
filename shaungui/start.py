@@ -13,7 +13,6 @@ def start():
     glfw.window_hint(glfw.OPENGL_FORWARD_COMPAT, True)
 
     while windows:
-        
         for window in windows:
             window.render()
             if glfw.window_should_close(window.glfw_window):

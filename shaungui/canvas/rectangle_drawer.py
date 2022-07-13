@@ -38,6 +38,7 @@ class RectangleDrawer:
             out vec4 gs_colour;
 
             void main() {
+                // main shape
                 gs_colour = vs_colour[0];
                 gl_Position = projection * vec4(position[0].x, position[0].y, 0.0, 1.0); // bottom left
                 EmitVertex();

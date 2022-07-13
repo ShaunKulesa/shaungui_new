@@ -28,7 +28,7 @@ class Canvas:
 
         self.rectangle_buffer_needs_updating = True
 
-    def create_rectangle(self, x, y, width, height, colour, id=None, tags=[]):
+    def create_rectangle(self, x, y, width, height, colour, id=None, tags=[]) -> str:
         self.rectangle_drawer.rectangle_points.extend([x, y, width, height, colour[0], colour[1], colour[2], colour[3]])
         self.rectangle_drawer.rectangle_buffer_needs_updating = True
         
@@ -44,6 +44,8 @@ class Canvas:
             self.tags[tag].append(id)
        
         self.ids[id] = ["rectangle", len(self.rectangle_drawer.rectangle_points) // 8]
+
+        return id
     
     def place(self, x, y):
         self.x = x

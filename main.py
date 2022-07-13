@@ -25,7 +25,6 @@ def update():
             canvas.move("rectangle3", 25, 0)
             canvas.move("rectangle4", 25, 0)
 
-
     window.after(update, 0.1)
 
 window.after(update, 0.1)

@@ -1,5 +1,5 @@
-from time import perf_counter
 from OpenGL import GL
+from array import array
 from .rectangle_drawer import RectangleDrawer
 
 class Canvas:
@@ -11,9 +11,9 @@ class Canvas:
         self.width = width
         self.height = height
 
-        self.tags = {}
-        self.counter = 0
         self.ids = {}
+        self.counter = 0
+        self.tags = {}
 
         self.rectangle_drawer = RectangleDrawer(self.width, self.height)
 
@@ -26,81 +26,101 @@ class Canvas:
         self.create_rectangle(self.width - border_width, 0, border_width, self.height, [item / 255 for item in border_colour], id="right_border")
         self.create_rectangle(0, self.height - border_width, self.width, border_width, [item / 255 for item in border_colour], id="top_border")
 
-        self.rectangle_buffer_needs_updating = True
-
     def create_rectangle(self, x, y, width, height, colour, id=None, tags=[]) -> str:
+        # works
         self.rectangle_drawer.rectangle_points.extend([x, y, width, height, colour[0], colour[1], colour[2], colour[3]])
         self.rectangle_drawer.rectangle_buffer_needs_updating = True
         
         if id is None:
-            id = f'canvas_rectangle{self.counter}'
-            self.ids[id] = ["rectangle", len(self.rectangle_drawer.rectangle_points) // 8]
+            id = f'canvas_object{self.counter}'
             self.counter += 1
-            return
 
         for tag in tags:
             if tag not in self.tags:
                 self.tags[tag] = []
             self.tags[tag].append(id)
        
-        self.ids[id] = ["rectangle", len(self.rectangle_drawer.rectangle_points) // 8]
-
+        self.ids[id] = ["rectangle", x, y, width, height, [colour[0], colour[1], colour[2], colour[3]], []]
+        
         return id
     
-    def place(self, x, y):
+    def place(self, x, y) -> None:
+        # works
         self.x = x
         self.y = y
 
         self.parent.widgets.append(self)
     
-    def move_to(self, id, x, y):
+    def move_to(self, id, x, y) -> None:
+        # works
+        if id not in self.ids:
+            return "Id not found"
+
+        index = self.get_index(id)
+
         if self.ids[id][0] == "rectangle":
-            self.rectangle_drawer.rectangle_points[(self.ids[id][1] * 8) - 8] = x
-            self.rectangle_drawer.rectangle_points[(self.ids[id][1] * 8 + 1) - 8] = y
-            self.rectangle_buffer_needs_updating = True
-    
-    def move(self, id, x, y):
-        if self.ids[id][0] == "rectangle":
-            self.rectangle_drawer.rectangle_points[(self.ids[id][1] * 8) - 8] += x
-            self.rectangle_drawer.rectangle_points[(self.ids[id][1] * 8 + 1) - 8] += y
+            self.ids[id][1] = x
+            self.ids[id][2] = y
+
+            self.rectangle_drawer.rectangle_points[(index * 8) - 8] = x
+            self.rectangle_drawer.rectangle_points[(index * 8) - 7] = y
             self.rectangle_drawer.rectangle_buffer_needs_updating = True
     
-    def get_coords(self, id) -> list[float]:
-        for shape_id in self.ids:
-            if id == shape_id:
-                if self.ids[id][0] == "rectangle":
-                    return self.rectangle_drawer.rectangle_points[(self.ids[id][1] * 8) - 8], self.rectangle_drawer.rectangle_points[(self.ids[id][1] * 8) - 7]
-                break
+    def move(self, id, x, y) -> None:
+        # works
+        if id not in self.ids:
+            return "Id not found"
+
+        index = self.get_index(id)
+
+        if self.ids[id][0] == "rectangle":
+            self.ids[id][1] += x
+            self.ids[id][2] += y
+
+            self.rectangle_drawer.rectangle_points[(index * 8) - 8] += x
+            self.rectangle_drawer.rectangle_points[(index * 8) - 7] += y
+            self.rectangle_drawer.rectangle_buffer_needs_updating = True
     
-    def get_size(self, id) -> list[float]:
-        for shape_id in self.ids:
-            if id == shape_id:
-                if self.ids[id][0] == "rectangle":
-                    return self.rectangle_drawer.rectangle_points[(self.ids[id][1] * 8) - 6], self.rectangle_drawer.rectangle_points[(self.ids[id][1] * 8) - 5]
-                break
+    def get_coords(self, id) -> tuple[float, float]:
+        # works
+        if id not in self.ids:
+            return "Id not found"
+
+        if self.ids[id][0] == "rectangle":
+            return (
+            self.ids[id][1],
+            self.ids[id][2]
+            )
     
-    def get_colour(self, id) -> list[float]:
-        for shape_id in self.ids:
-            if id == shape_id:
-                if self.ids[id][0] == "rectangle":
-                    return [
-                    self.rectangle_drawer.rectangle_points[(self.ids[id][1] * 8) - 4],
-                    self.rectangle_drawer.rectangle_points[(self.ids[id][1] * 8) - 3],
-                    self.rectangle_drawer.rectangle_points[(self.ids[id][1] * 8) - 2],
-                    self.rectangle_drawer.rectangle_points[(self.ids[id][1] * 8) - 1]
-                    ]
-                break
+    def get_size(self, id) -> tuple[float, float]:
+        # works
+        if id not in self.ids:
+            return "Id not found"
+
+        if self.ids[id][0] == "rectangle":
+            return (
+            self.ids[id][3],
+            self.ids[id][4]
+            )
+
+    def get_colour(self, id) -> tuple[float, float, float, float]:
+        # works
+        if id not in self.ids:
+            return "Id not found"
+
+        if self.ids[id][0] == "rectangle":
+            return (self.ids[5])
     
     def set_colour(self, id, colour):
-        for shape_id in self.ids:
-            if id == shape_id:
-                if self.ids[id][0] == "rectangle":
-                    self.rectangle_drawer.rectangle_points[(self.ids[id][1] * 8) - 4] = colour[0]
-                    self.rectangle_drawer.rectangle_points[(self.ids[id][1] * 8) - 3] = colour[1]
-                    self.rectangle_drawer.rectangle_points[(self.ids[id][1] * 8) - 2] = colour[2]
-                    self.rectangle_drawer.rectangle_points[(self.ids[id][1] * 8) - 1] = colour[3]
-                    self.rectangle_buffer_needs_updating = True
-                break
+        if id not in self.ids:
+            return "Id not found"
+        
+        index = self.get_index(id)
+
+        if self.ids[id][0] == "rectangle":
+            self.ids[5] = colour
+            self.rectangle_drawer.rectangle_points[(index * 8) - 4 : (index * 8)] = array('f', colour)
+            self.rectangle_drawer.rectangle_buffer_needs_updating = True
     
     def tag_collision(self, tag, target_id=None, target_tags=[]) -> list:
         if target_id:
@@ -108,16 +128,19 @@ class Canvas:
             x, y = self.get_coords(target_id)
             width, height = self.get_size(target_id)
 
-            # if sel.ids[target_id][0] == "rectangle":
-            #     return self.rectangle_drawer.rectangle_collision(x, y, width, height, tag, target_tags
-    
     def id_collision(self, id, target_id=None, target_tag=None) -> list:
+        if id not in self.ids:
+            return "id not found"
+            
         collisions = []
+        x, y = self.get_coords(id)
+        width, height = self.get_size(id)
         
         if target_id:
+            if target_id not in self.ids:
+                return "target id not found"
+                
             if self.ids[id][0] == "rectangle" and self.ids[target_id][0] == "rectangle":
-                x, y = self.get_coords(id)
-                width, height = self.get_size(id)
                 target_x, target_y = self.get_coords(target_id)
                 target_width, target_height = self.get_size(target_id)
 
@@ -125,10 +148,11 @@ class Canvas:
                     collisions.append(target_id)
 
         if target_tag:
+            if target_tag not in self.tags:
+                return "target tag not found"
+
             for object in self.tags[target_tag]:
                 if self.ids[object][0] == "rectangle" and self.ids[id][0] == "rectangle":
-                    x, y, = self.get_coords(object)
-                    width, height = self.get_size(object)
                     target_x, target_y = self.get_coords(id)
                     target_width, target_height = self.get_size(id)
 
@@ -137,6 +161,48 @@ class Canvas:
         
         return collisions
         
+    def add_tag(self, id, tag):
+        if tag not in self.tags:
+            self.tags[tag] = []
+        self.tags[tag].append(id)
+    
+    def remove_tag(self, id, tag):
+        if tag not in self.tags:
+            return "Tag not found"
+        
+        if id in self.tags[tag]:
+            self.tags[tag].remove(id)
+        else:
+            return "Id does not have this tag"
+    
+    def delete_tag(self, tag):
+        if tag not in self.tags:
+            return "Tag not found"
+        
+        self.tags.pop(tag)
+    
+    def delete_id(self, id):
+        if id not in self.ids:
+            return "Id not found"
+        
+        self.ids.pop(id)
+        
+        for tag in self.tags:
+            for id in tag:
+                if id == id:
+                    self.tags[tag].remove(id)
+                    break
+    
+    def get_index(self, id):
+        # Gets the index of the id's points in the points array
+
+        index = 1
+
+        for key in self.ids.keys():
+            if key == id:
+                return index
+            index += 1
+
     def render(self):
         GL.glViewport(self.x, self.y, self.width, self.height)
 

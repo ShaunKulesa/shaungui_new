@@ -91,7 +91,7 @@ class RectangleDrawer:
 
     def update_rectangles(self):
         GL.glBindBuffer(GL.GL_ARRAY_BUFFER, self.rectangles_buffer)
-        GL.glBufferData(GL.GL_ARRAY_BUFFER, self.rectangle_points.tobytes(), GL.GL_DYNAMIC_DRAW)
+        GL.glBufferData(GL.GL_ARRAY_BUFFER, self.rectangle_points.tobytes(), GL.GL_STREAM_DRAW)
     
     def draw_rectangles(self):
         if self.rectangle_buffer_needs_updating:
